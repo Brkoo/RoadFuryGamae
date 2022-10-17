@@ -9,29 +9,11 @@
 
 # Summary :clipboard:
 
-Add your pet, track and monitor his medicine, weight, health. Find nearby vet-s and more.
-* Has an easy to use user interface,
-* Doesn't require you to create an account,
-* Vet-s, pet shops nearby
-
-# Other features 🐶:
-- Support for more than one pet
-- Support for many different breeds
-- Automatic notifications
-- Google maps support with all vets and shops in your region
-
-
-# Cooming soon :eyes:
-- Taking picutres of your pet
-- Support for smart monitoring collar
-- Resizbale widgets
-- Monitor your pet with graphs
-
+*Simple car game, using arrow keys you dodge enemy cars, in thight situations you can shoot them as well.
+*When you are running low on ammo just pick it up.
 
 # Privacy :lock:
 This app has no ads and requests no unnecessary permissions. The location permission is only needed to find a Bluetooth scale. Once found the permission can be revoked (or never granted if Bluetooth isn't used).
-
-
 
 # Screenshots 📱:
 <b>Note: </b>Comming soon 
