@@ -16,4 +16,5 @@ When you are running low on ammo just pick it up.
 This app has no ads and requests no unnecessary permissions. The location permission is only needed to find a Bluetooth scale. Once found the permission can be revoked (or never granted if Bluetooth isn't used).
 
 # Screenshots 📱:
-<b>Note: </b>Comming soon 
+![RoadFury-ScreenShot](https://user-images.githubusercontent.com/63784386/196273299-91b3ed97-79c2-465a-bc99-e8ecdc4d57b6.jpg)
+
