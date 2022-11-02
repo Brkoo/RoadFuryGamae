@@ -15,4 +15,6 @@ public class DynamicGameObject extends GameObject{
         bounds.set(position.x, position.y, bounds.width, bounds.height);
     }
 
+    public void setCreateNextInTime(long nanoTime) {
+    }
 }
