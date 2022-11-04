@@ -3,6 +3,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../assets"]
 
 project.ext.mainClassName = "com.roadfury.game.DesktopLauncher"
+project.ext.mainClassName = "objectOriented.DesktopLauncherOO"
 project.ext.assetsDir = new File("../assets")
 
 import org.gradle.internal.os.OperatingSystem

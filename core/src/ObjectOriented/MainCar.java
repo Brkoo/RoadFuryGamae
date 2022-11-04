@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class MainCar extends DynamicGameObject{
+    public boolean invincibility = false;
+
     public MainCar(float x, float y, float width, float height) {
         super(x, y, width, height);
     }
@@ -42,7 +44,12 @@ public class MainCar extends DynamicGameObject{
     }
     @Override
     public void render(SpriteBatch batch){
+        if(invincibility){
+            batch.draw(Assets.mainCarImagePower, position.x, position.y, bounds.width, bounds.height);
+            batch.draw(Assets.gunImage,  position.x, position.y, bounds.width, bounds.height);
+        }else{
         batch.draw(Assets.mainCarImage, position.x, position.y, bounds.width, bounds.height);
         batch.draw(Assets.gunImage,  position.x, position.y, bounds.width, bounds.height);
+    }
     }
 }

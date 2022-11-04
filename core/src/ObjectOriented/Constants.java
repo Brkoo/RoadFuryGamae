@@ -13,6 +13,7 @@ public class Constants {
     public static final float SPEED = 400;    // pixels per second
     public static final int BULLET_SPEED = 350;
     public static final int SPEED_MAIN_CAR = 200; // pixels per second
+    public static final long CREATE_POWER_UP = 1000000000; // ns
     public static  float SPEED_OBSTACLE_CAR = 200;    // pixels per second
     public static long CREATE_OBSTACLE_CAR_TIME = 1000000000;
     public static final long CREATE_AMMO_PACK_TIME = 1000000000;// ns

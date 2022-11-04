@@ -11,10 +11,13 @@ public class DynamicGameObject extends GameObject{
     void update(float deltaTime){
 
     }
-    void updateBounds(float deltaTime){
+    void updateBounds(){
         bounds.set(position.x, position.y, bounds.width, bounds.height);
     }
 
     public void setCreateNextInTime(long nanoTime) {
+    }
+    public void generateRandomPosition(float height){
+
     }
 }

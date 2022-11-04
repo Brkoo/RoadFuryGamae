@@ -3,14 +3,16 @@ package ObjectOriented;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import javax.crypto.Cipher;
 
-public class  ObstacleCar extends DynamicGameObject{
+public class  ObstacleCar extends DynamicGameObject implements Pool.Poolable{
     public static long createNextInTime = Constants.CREATE_OBSTACLE_CAR_TIME;
     public static long lastObstacleCar;
     public static int roadNumber = 1;
+    public float y;
 
 
     public ObstacleCar(float x, float y, float width, float height) {
@@ -19,20 +21,28 @@ public class  ObstacleCar extends DynamicGameObject{
         super(x, y, Assets.obstacleCarImage.getWidth(), Assets.obstacleCarImage.getHeight());
 
     }
+    public ObstacleCar(float y){
+
+        super(0,y, Assets.obstacleCarImage.getWidth(),Assets.obstacleCarImage.getHeight());
+        this.y = y;//generateRandomPosition();
+    }
     public static boolean isTimeToCreateNew(){
         return TimeUtils.nanoTime() - lastObstacleCar  > createNextInTime;
     }
     @Override
     public void update(float deltaTime){
-        position.y -= Constants.SPEED_OBSTACLE_CAR * Gdx.graphics.getDeltaTime();
+        position.y -= Constants.SPEED_OBSTACLE_CAR * deltaTime;
        // bounds.set(position.x, position.y, bounds.getWidth(), bounds.getHeight());
 
     }
+    @Override
     public void setCreateNextInTime(long time){
-       lastObstacleCar = time;
-    }
-    public void generateRandomPosition(float width, float height){
 
+        lastObstacleCar = time;
+    }
+    @Override
+    public void generateRandomPosition(float height){
+        position.y = height + this.bounds.height;
         //ObstacleCar obstacleCar = new ObstacleCar(0,height,Assets.obstacleCarImage.getWidth(), Assets.obstacleCarImage.getHeight());
         int newRoadNumber = 1;
         while(newRoadNumber == roadNumber){
@@ -59,5 +69,12 @@ public class  ObstacleCar extends DynamicGameObject{
     public void render(SpriteBatch batch){
         batch.draw(Assets.obstacleCarImage, position.x, position.y, bounds.width, bounds.height);
 
+    }
+
+    @Override
+    public void reset() {
+        generateRandomPosition(y);
+        this.position.set(position.x, position.y);
+        System.out.println("This car is reset");
     }
 }
