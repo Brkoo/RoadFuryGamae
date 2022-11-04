@@ -3,6 +3,7 @@ package ObjectOriented;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -222,8 +223,14 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                     if (Gdx.input.isKeyPressed(Input.Keys.UP)) mainCar.commandMoveUp();
                     if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) mainCar.commandMoveRight();
                     if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) mainCar.commandMoveDown();
-
-                    if(Gdx.input.isKeyPressed(Input.Keys.P)) state.setState(2);
+                    Gdx.input.setInputProcessor(new InputAdapter(){
+                        @Override public boolean keyUp (int keycode) {
+                            if (keycode == Input.Keys.P)
+                                state.setState(2);
+                            return true;
+                        }
+                    });
+                    //if(Gdx.input.isKeyJustPressed(Input.Keys.P)) state.setState(2);
                     if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && Bullet.isTimeToCreateNew() && gameObjectScore.ammo > 0) {
                         spawnBullet();
                         gameObjectScore.ammo -= 1;
@@ -255,7 +262,14 @@ public class RoadFuryGameOO extends ApplicationAdapter {
             case 2:
                 batch.begin();
                 state.render(batch);
-                if(Gdx.input.isKeyPressed(Input.Keys.P)) state.setState(1);
+                Gdx.input.setInputProcessor(new InputAdapter() {
+                                                @Override
+                                                public boolean keyUp(int keycode) {
+                                                    if (keycode == Input.Keys.P)
+                                                        state.setState(1);
+                                                    return true;
+                                                }
+                                            });
                 batch.end();
                 break;
             case 3:
@@ -264,10 +278,11 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                 gameObjectEnd.render(batch);
                 gameObjectScore.render(batch);
                 activeObstacleCars.clear();
-
+                dynamicActors.clear();
                 if(Gdx.input.isKeyPressed(Input.Keys.R)) {
-
-
+                    spawnPowerUp();
+                    spawnAmmo();
+                    spawnObstacleCar();
                     gameObjectScore.score = 0;
                     mainCar.position.set(mainCarStartingPosition);
                     gameObjectScore.ammo = 0;
