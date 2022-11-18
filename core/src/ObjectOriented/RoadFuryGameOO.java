@@ -4,13 +4,24 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
+import util.ViewportUtils;
+import util.debug.DebugCameraController;
+import util.debug.MemoryInfo;
 
 import java.util.Iterator;
 
@@ -28,10 +39,23 @@ public class RoadFuryGameOO extends ApplicationAdapter {
     private BulletPool bp;
     private GameObjectScore gameObjectScore;
     private GameObjectEnd gameObjectEnd;
-    //private PowerUp powerUp;
-    private State state;
-    float width, height;
     private Vector2 mainCarStartingPosition;
+    public static float PPM = 16;
+    private State state;
+    int width, height;
+    //DEBUG
+    private DebugCameraController debugCameraController;
+    private MemoryInfo memoryInfo;
+    private boolean debug = false;
+    private ShapeRenderer shapeRenderer;
+    private Viewport viewport;
+    private ParticleEffect particleEffectExplosion;
+    private ParticleEffect particleEffectBulletTrail;
+    private ParticleEffectPool bigExplosionPool;
+    private ParticleEffectPool bulletTrailPool;
+    Array<ParticleEffectPool.PooledEffect> effects_explosion = new Array();
+    Array<ParticleEffectPool.PooledEffect> effects_bullet_trail = new Array();
+
 
 
     @Override
@@ -60,8 +84,28 @@ public class RoadFuryGameOO extends ApplicationAdapter {
 
         dynamicActors = new Array<DynamicGameObject>();
         ocp = new ObstacleCarPool(height, 50);
+        //v create, show ali konstruktorju
 
-       // bullets = new Array<DynamicGameObject>();
+        //DEBUG
+        debugCameraController = new DebugCameraController();
+        debugCameraController.setStartPosition(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
+        memoryInfo = new MemoryInfo(500);
+
+        shapeRenderer = new ShapeRenderer();
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+
+        //Particle effects
+        particleEffectExplosion = new ParticleEffect();
+        particleEffectExplosion.load(Gdx.files.internal("Particle Park Explosion.p"), Gdx.files.internal(""));
+        //pe.getEmitters().first().setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        //pe.setEmittersCleanUpBlendFunction(false);
+        bigExplosionPool = new ParticleEffectPool(particleEffectExplosion, 0, 20);
+
+        particleEffectBulletTrail = new ParticleEffect();
+        particleEffectBulletTrail.load(Gdx.files.internal("Particle Park Smoke.p"), Gdx.files.internal(""));
+
+      // bulletTrailPool = new ParticleEffectPool(particleEffectBulletTrail, 0, 20);
+        // bullets = new Array<DynamicGameObject>();
         //add first astronout and asteroid
         spawnPowerUp();
         spawnObstacleCar();
@@ -95,11 +139,16 @@ public class RoadFuryGameOO extends ApplicationAdapter {
 
     private void spawnBullet() {
         DynamicGameObject bullet = bp.obtain();
+
         bullet.position.set(mainCar.position.x + mainCar.bounds.width / 2f, mainCar.position.y + mainCar.bounds.height / 2f);
         // Bullet bullet = new Bullet(mainCar);
-        // bullets.add(bullet);
+        //ParticleEffectPool.PooledEffect effect = bulletTrailPool.obtain();
+
+        //effects_bullet_trail.add(effect);
+        //bullets.add(bullet);
         activeBullets.add(bullet);
         bullet.setCreateNextInTime(TimeUtils.nanoTime());
+
         //bullet.update(TimeUtils.nanoTime());
         // System.out.println(bullet.getFree());
         System.out.println(bullet.bounds.y + "To je bounds x \n");
@@ -111,11 +160,21 @@ public class RoadFuryGameOO extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // tell the camera to update its matrices.
         camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        //batch.setProjectionMatrix(camera.combined);
 
 
         switch (state.getState()){
             case 1:
+
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) debug = !debug;
+
+                if (debug) {
+                    debugCameraController.handleDebugInput(Gdx.graphics.getDeltaTime());
+                    memoryInfo.update();
+                }
+
+
                 PowerUp.checkTimeInvincibility(gameObjectScore.score);
                 if (gameObjectScore.mainCarHealth > 0) {
                     for (DynamicGameObject act : dynamicActors) {
@@ -152,12 +211,13 @@ public class RoadFuryGameOO extends ApplicationAdapter {
 
                     for (Iterator<DynamicGameObject> iter = activeObstacleCars.iterator(); iter.hasNext(); ) {
                         DynamicGameObject act = iter.next();
-                        if (act.position.y + act.bounds.height + 20 < 0){
+                        if (act.position.y + act.bounds.height < 0){
 
 
                             ocp.free(act);
-                            activeObstacleCars.removeValue(act, true);
+                            //activeObstacleCars.removeValue(act, true);
                             iter.remove();
+
 
                         }
                         mainCar.update(Gdx.graphics.getDeltaTime());
@@ -179,15 +239,26 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                         for (DynamicGameObject bullet : activeBullets) {
                             //bullet.update(Gdx.graphics.getDeltaTime());
                             if (bullet.position.y > height) {
+
                                 bp.free(bullet);
+
                                 activeBullets.removeValue(bullet, true);
+
                             }
+
                             if (bullet.bounds.overlaps(act.bounds)) {
+                                ParticleEffectPool.PooledEffect effect = bigExplosionPool.obtain();
+                                effect.setPosition(act.position.x + Assets.obstacleCarImage.getWidth() / 2f, act.position.y + Assets.obstacleCarImage.getHeight() / 2f);
+                                effects_explosion.add(effect);
                                 iter.remove();
+
                                 bp.free(bullet);
                                 ocp.free(act);
                                 activeObstacleCars.removeValue(act, true);
                                 activeBullets.removeValue(bullet, true);
+                                //particleEffectBulletTrail.allowCompletion();
+                               // particleEffectBulletTrail.dispose();
+
                             }
                         }
                 /*
@@ -233,12 +304,24 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                     //if(Gdx.input.isKeyJustPressed(Input.Keys.P)) state.setState(2);
                     if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && Bullet.isTimeToCreateNew() && gameObjectScore.ammo > 0) {
                         spawnBullet();
+
                         gameObjectScore.ammo -= 1;
 
                     }
 
+                } else {
+                    state.setState(3);
+                }
+
+                     camera.update();
+
+                    // tell the SpriteBatch to render in the
+                    // coordinate system specified by the camera
+                    batch.setProjectionMatrix(camera.combined);
                     batch.begin();
                     {
+
+
                         batch.draw(Assets.mainBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                         mainCar.render(batch);
                         gameObjectScore.render(batch);
@@ -247,18 +330,87 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                             act.render(batch);
                         }
                         for (DynamicGameObject bullet : activeBullets) {
+
+                            /*
+                            for(int j = effects_bullet_trail.size - 1; j >= 0; j--){
+
+                                ParticleEffectPool.PooledEffect effect = effects_bullet_trail.get(j);
+                                effect.setPosition(bullet.position.x, bullet.position.y);
+                                effect.draw(batch, Gdx.graphics.getDeltaTime());
+                                if(effect.isComplete()){
+                                    effect.free();
+                                    effects_bullet_trail.removeIndex(j);
+                                }
+                            }
+
+                             */
+
+
+
+
                             bullet.render(batch);
                             gameObjectScore.render(batch);
                         }
                         for(DynamicGameObject obstacleCar: activeObstacleCars){
                             obstacleCar.render(batch);
                         }
+                        //batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        for(int i = effects_explosion.size - 1; i>= 0; i--){
+                            ParticleEffectPool.PooledEffect effect = effects_explosion.get(i);
+                            effect.draw(batch, Gdx.graphics.getDeltaTime());
+                            if(effect.isComplete()){
+                                effect.free();
+                                effects_explosion.removeIndex(i);
+                            }
+                        }
+
                         batch.end();
+
+
                     }
-                } else {
-                    state.setState(3);
-                }
-                break;
+
+                    if (debug) {
+                        debugCameraController.applyTo(camera);
+                        batch.begin();
+                        {
+                            // the average number of frames per second
+                            GlyphLayout layout = new GlyphLayout(Assets.font, "FPS:" + Gdx.graphics.getFramesPerSecond());
+                            Assets.font.setColor(Color.YELLOW);
+                            Assets.font.draw(batch, layout, Gdx.graphics.getWidth() - layout.width, Gdx.graphics.getHeight() - 50);
+
+                            // number of rendering calls, ever; will not be reset unless set manually
+                            Assets.font.setColor(Color.YELLOW);
+                            Assets.font.draw(batch, "RC:" + batch.totalRenderCalls, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() - 20);
+
+                            memoryInfo.render(batch, Assets.font);
+                        }
+                        batch.end();
+                        batch.totalRenderCalls = 0;
+                        ViewportUtils.drawGrid(viewport, shapeRenderer, 50);
+
+                        // print rectangles
+                        shapeRenderer.setProjectionMatrix(camera.combined);
+                        // https://libgdx.badlogicgames.com/ci/nightlies/docs/api/com/badlogic/gdx/graphics/glutils/ShapeRenderer.html
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                        {
+                            shapeRenderer.setColor(1, 1, 0, 1);
+                            for (DynamicGameObject act : dynamicActors) {
+                                shapeRenderer.rect(act.position.x, act.position.y, act.bounds.getWidth(), act.bounds.getHeight());
+                            }
+
+                            for (DynamicGameObject bullet : activeBullets) {
+                                shapeRenderer.rect(bullet.position.x, bullet.position.y, bullet.bounds.getWidth(), bullet.bounds.getHeight());
+                            }
+
+
+                            for (DynamicGameObject obstacleCar: activeObstacleCars) {
+                                shapeRenderer.rect(obstacleCar.position.x, obstacleCar.position.y, obstacleCar.bounds.getWidth(), obstacleCar.bounds.getHeight());
+                            }
+                            shapeRenderer.rect(mainCar.position.x, mainCar.position.y, mainCar.bounds.getWidth(), mainCar.bounds.getHeight());
+                        }
+                        shapeRenderer.end();
+                    }
+                         break;
             case 2:
                 batch.begin();
                 state.render(batch);

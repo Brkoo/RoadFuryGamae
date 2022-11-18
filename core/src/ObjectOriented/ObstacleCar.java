@@ -29,18 +29,18 @@ public class  ObstacleCar extends DynamicGameObject implements Pool.Poolable{
     public static boolean isTimeToCreateNew(){
         return TimeUtils.nanoTime() - lastObstacleCar  > createNextInTime;
     }
-    @Override
+
     public void update(float deltaTime){
         position.y -= Constants.SPEED_OBSTACLE_CAR * deltaTime;
        // bounds.set(position.x, position.y, bounds.getWidth(), bounds.getHeight());
 
     }
-    @Override
+
     public void setCreateNextInTime(long time){
 
         lastObstacleCar = time;
     }
-    @Override
+
     public void generateRandomPosition(float height){
         position.y = height + this.bounds.height;
         //ObstacleCar obstacleCar = new ObstacleCar(0,height,Assets.obstacleCarImage.getWidth(), Assets.obstacleCarImage.getHeight());

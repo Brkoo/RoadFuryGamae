@@ -20,4 +20,5 @@ public class DynamicGameObject extends GameObject{
     public void generateRandomPosition(float height){
 
     }
+
 }
