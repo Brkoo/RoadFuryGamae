@@ -28,6 +28,7 @@ public class State extends GameObject {
     private void pause(SpriteBatch batch){
         state = 2;
         Assets.font.setColor(Color.RED);
+        //Assets.font.getData().setScale(4);
         Assets.font.draw(batch, "PAUSE",position.x, position.y);
 
 
@@ -35,6 +36,13 @@ public class State extends GameObject {
     private void resume(SpriteBatch batch){
         state = 1;
         Gdx.app.getApplicationListener().resume();
+    }
+    @Override
+    public void render(SpriteBatch batch){
+        state = 2;
+        Assets.font.setColor(Color.RED);
+        //Assets.font.getData().setScale(4);
+        Assets.font.draw(batch, "PAUSE",position.x, position.y);
     }
 
 }

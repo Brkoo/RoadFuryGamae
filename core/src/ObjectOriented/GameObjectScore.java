@@ -35,6 +35,7 @@ public class GameObjectScore extends GameObject{
     @Override
     public void render(SpriteBatch batch){
         Assets.font.setColor(Color.YELLOW);
+        Assets.font.getData().setScale(2);
         Assets.font.draw(batch, "" + getScore(), position.x - 540, bounds.y+bounds.height - 20);
         Assets.font.setColor(Color.GREEN);
         Assets.font.draw(batch, "" + getAmmo(), bounds.x, bounds.y+bounds.height - 20);

@@ -96,7 +96,7 @@ public class RoadFuryGameOO extends ApplicationAdapter {
 
         //Particle effects
         particleEffectExplosion = new ParticleEffect();
-        particleEffectExplosion.load(Gdx.files.internal("Particle Park Explosion.p"), Gdx.files.internal(""));
+        particleEffectExplosion.load(Gdx.files.internal("Particle Park Explosion Small.p"), Gdx.files.internal(""));
         //pe.getEmitters().first().setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         //pe.setEmittersCleanUpBlendFunction(false);
         bigExplosionPool = new ParticleEffectPool(particleEffectExplosion, 0, 20);
@@ -314,6 +314,7 @@ public class RoadFuryGameOO extends ApplicationAdapter {
                 }
 
                      camera.update();
+
 
                     // tell the SpriteBatch to render in the
                     // coordinate system specified by the camera

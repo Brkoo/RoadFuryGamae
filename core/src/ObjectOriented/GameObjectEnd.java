@@ -12,7 +12,7 @@ public class GameObjectEnd extends GameObject {
 
     @Override
     public void render(SpriteBatch batch){
-
+        //Assets.font.getData().setScale(4);
         Assets.font.setColor(Color.RED);
 
         Assets.font.draw(batch, "GAME OVER" ,bounds.x, bounds.y+bounds.height - 20);
